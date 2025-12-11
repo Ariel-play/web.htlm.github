@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Tugas Operasi TNI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><pattern id="camo" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><rect fill="%232d4a2b" width="100" height="100"/><ellipse cx="20" cy="20" rx="15" ry="20" fill="%231a3a1a"/><ellipse cx="70" cy="40" rx="20" ry="15" fill="%233d5a3b"/><ellipse cx="40" cy="70" rx="18" ry="22" fill="%234a6948"/><ellipse cx="85" cy="85" rx="12" ry="18" fill="%231a3a1a"/></pattern></defs><rect width="400" height="400" fill="url(%23camo)"/></svg>');
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2d4a2b, #1a3a1a);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header img {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            left: 20px;
+            top: 15px;
+        }
+
+        .bell-icon {
+            position: absolute;
+            right: 20px;
+            top: 25px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .page {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #4a6948, #2d4a2b);
+            border-radius: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 18px;
+            color: #2d4a2b;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            font-size: 20px;
+            color: #2d4a2b;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4a6948;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .radio-group input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a6948, #2d4a2b);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(45, 74, 43, 0.3);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 20px;
+        }
+
+        .menu-item {
+            background: linear-gradient(135deg, #4a6948, #2d4a2b);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .menu-item.highlight {
+            border: 3px solid #00bcd4;
+        }
+
+        .menu-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .task-item {
+            background: linear-gradient(135deg, #4a6948, #2d4a2b);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+        }
+
+        .task-icon {
+            font-size: 32px;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .task-date {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .task-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-selesai {
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        .status-proses {
+            background: rgba(255, 193, 7, 0.3);
+        }
+
+        .status-belum {
+            background: rgba(244, 67, 54, 0.3);
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .file-item {
+            background: linear-gradient(135deg, #4a6948, #2d4a2b);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-item:hover {
+            transform: translateX(5px);
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .arsip-item {
+            background: linear-gradient(135deg, #4a6948, #2d4a2b);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .arsip-item:hover {
+            transform: translateX(5px);
+        }
+
+        .arsip-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .arsip-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .arsip-date {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .arsip-status {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: auto;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, #4a6948, #2d4a2b);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            position: absolute;
+            left: 20px;
+            top: 25px;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50,10 90,90 10,90' fill='%23FFD700'/%3E%3Ctext x='50' y='70' font-size='40' text-anchor='middle' fill='%23000'>🦅</text>%3C/svg%3E" alt="Garuda">
+            <span class="bell-icon">🔔</span>
+            <div class="user-info">
+                <div class="user-avatar">👤</div>
+                <div>
+                    <div style="font-weight: bold;" id="headerName">Nama</div>
+                    <div style="font-size: 12px; opacity: 0.8;" id="headerRole">KOMANDAN</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div class="page active" id="loginPage">
+            <div class="logo-container">
+                <div class="logo">🛡️</div>
+                <h1>MANAJEMEN</h1>
+                <h1>TUGAS OPERASI TNI</h1>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="nrpInput" placeholder="🆔 NRP">
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="passwordInput" placeholder="🔒 PASSWORD">
+            </div>
+
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="role" value="KOMANDAN" checked>
+                    <span>KOMANDAN</span>
+                </label>
+                <label>
+                    <input type="radio" name="role" value="PRAJURIT">
+                    <span>PRAJURIT</span>
+                </label>
+            </div>
+
+            <button class="btn btn-primary" onclick="login()">LOGIN</button>
+        </div>
+
+        <!-- Main Menu -->
+        <div class="page" id="mainMenu">
+            <div class="menu-grid">
+                <div class="menu-item" onclick="goToPage('tugasPage')">
+                    <div class="menu-icon">📋</div>
+                    <div style="font-weight: bold;">TUGAS</div>
+                </div>
+                <div class="menu-item" onclick="goToPage('laporanPage')">
+                    <div class="menu-icon">📄</div>
+                    <div style="font-weight: bold;">LAPORAN TUGAS</div>
+                </div>
+                <div class="menu-item highlight" onclick="goToPage('arsipPage')">
+                    <div class="menu-icon">🗄️</div>
+                    <div style="font-weight: bold;">ARSIP</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daftar Tugas Prajurit -->
+        <div class="page" id="tugasPage">
+            <button class="back-btn" onclick="goToPage('mainMenu')">←</button>
+            <h2 style="text-align: center; margin-top: 40px;">DAFTAR TUGAS<br>PRAJURIT</h2>
+            <div class="task-list">
+                <div class="task-item" onclick="goToPage('fileAccessPage')">
+                    <div class="task-icon">✅</div>
+                    <div class="task-content">
+                        <div class="task-title">Patroli Malam</div>
+                        <div class="task-date">03/10/2025</div>
+                    </div>
+                    <div class="task-status status-selesai">Selesai</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-icon">⚙️</div>
+                    <div class="task-content">
+                        <div class="task-title">Pengamanan Pos</div>
+                        <div class="task-date">03/10/2025</div>
+                    </div>
+                    <div class="task-status status-proses">Proses</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-icon">📄</div>
+                    <div class="task-content">
+                        <div class="task-title">Laporan Harian</div>
+                        <div class="task-date">03/10/2025</div>
+                    </div>
+                    <div class="task-status status-belum">Belum dikerjakan</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-icon">⚠️</div>
+                    <div class="task-content">
+                        <div class="task-title">Pengawasan Gudang</div>
+                        <div class="task-date">04/10/2025</div>
+                    </div>
+                    <div class="task-status status-belum">Belum dikerjakan</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Akses File Prajurit -->
+        <div class="page" id="fileAccessPage">
+            <button class="back-btn" onclick="goToPage('tugasPage')">←</button>
+            <h2 style="text-align: center; margin-top: 40px;">AKSES FILE PRAJURIT</h2>
+            <div style="text-align: center; margin-bottom: 30px; font-size: 48px;">🔒🔒🔒</div>
+            <div class="file-list">
+                <div class="file-item">
+                    <div class="file-icon">📄</div>
+                    <div>Laporan_Tugas.pdf</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">🖼️</div>
+                    <div>Foto_Tugas.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">🎬</div>
+                    <div>Video_Tugas.mp4</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Laporan Tugas -->
+        <div class="page" id="laporanPage">
+            <button class="back-btn" onclick="goToPage('mainMenu')">←</button>
+            <h2 style="text-align: center; margin-top: 40px;">LAPORAN TUGAS</h2>
+            <div style="font-size: 12px; color: #666; margin-bottom: 20px;">Laporan tugas yang telah diselesaikan</div>
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-icon">📄</div>
+                    <div class="task-content">
+                        <div class="task-title">Patroli Malam</div>
+                        <div class="task-date">03-10-2025</div>
+                    </div>
+                    <div class="task-status status-selesai">Selesai</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daftar Arsip -->
+        <div class="page" id="arsipPage">
+            <button class="back-btn" onclick="goToPage('mainMenu')">←</button>
+            <h2 style="text-align: center; margin-top: 40px;">DAFTAR ARSIP</h2>
+            <div class="file-list">
+                <div class="arsip-item" onclick="goToPage('tugasPrajuritPage')">
+                    <div class="arsip-header">
+                        <div class="file-icon">📄</div>
+                        <div class="task-content">
+                            <div class="arsip-title">Laporan Patroli Malam</div>
+                            <div class="arsip-date">02-10-2025</div>
+                        </div>
+                        <div class="arsip-status status-selesai">Terkirim</div>
+                    </div>
+                </div>
+                <div class="arsip-item">
+                    <div class="arsip-header">
+                        <div class="file-icon">🎬</div>
+                        <div class="task-content">
+                            <div class="arsip-title">Dokumentasi Foto & Video</div>
+                            <div class="arsip-date">03-10-2025</div>
+                        </div>
+                        <div class="arsip-status status-proses">On File</div>
+                    </div>
+                </div>
+                <div class="arsip-item">
+                    <div class="arsip-header">
+                        <div class="file-icon">📄</div>
+                        <div class="task-content">
+                            <div class="arsip-title">Laporan Harian</div>
+                            <div class="arsip-date">03-10-2025</div>
+                        </div>
+                        <div class="arsip-status status-selesai">Terkirim</div>
+                    </div>
+                </div>
+                <div class="arsip-item">
+                    <div class="arsip-header">
+                        <div class="file-icon">📄</div>
+                        <div class="task-content">
+                            <div class="arsip-title">Instruksi Operasi 03/10</div>
+                            <div class="arsip-date">02-10-2025</div>
+                        </div>
+                        <div class="arsip-status status-belum">Belum diterima</div>
+                    </div>
+                </div>
+                <div class="arsip-item">
+                    <div class="arsip-header">
+                        <div class="file-icon">📄</div>
+                        <div class="task-content">
+                            <div class="arsip-title">Rekap Pengamanan Pos</div>
+                            <div class="arsip-date">05-10-2025</div>
+                        </div>
+                        <div class="arsip-status status-proses">Terkirim</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daftar Tugas Prajurit (Table) -->
+        <div class="page" id="tugasPrajuritPage">
+            <button class="back-btn" onclick="goToPage('arsipPage')">←</button>
+            <h2 style="text-align: center; margin-top: 40px;">DAFTAR TUGAS PRAJURIT</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>TANGGAL</th>
+                            <th>TUGAS</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2024-05-01</td>
+                            <td>Patroli</td>
+                            <td><span class="task-status status-selesai">SELESAI</span></td>
+                        </tr>
+                        <tr>
+                            <td>2024-05-02</td>
+                            <td>Laporan Harian</td>
+                            <td><span class="task-status status-selesai">SELESAI</span></td>
+                        </tr>
+                        <tr>
+                            <td>2024-05-03</td>
+                            <td>Latihan</td>
+                            <td><span class="task-status status-selesai">SELESAI</span></td>
+                        </tr>
+                        <tr>
+                            <td>2024-05-04</td>
+                            <td>Operasi</td>
+                            <td><span class="task-status status-proses">DALAM PROSES</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function login() {
+            const nrp = document.getElementById('nrpInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+
+            if (nrp && password) {
+                document.getElementById('headerName').textContent = 'Nama';
+                document.getElementById('headerRole').textContent = role;
+                goToPage('mainMenu');
+            } else {
+                alert('Mohon isi NRP dan Password!');
+            }
+        }
+
+        // Enter key support for login
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && document.getElementById('loginPage').classList.contains('active')) {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
